@@ -1650,6 +1650,13 @@ constexpr EnumStringDef<unsigned, 2> ElfHeaderLoongArchFlagsDefs[] = {
 constexpr auto ElfHeaderLoongArchFlags =
     BUILD_ENUM_STRINGS(ElfHeaderLoongArchFlagsDefs);
 
+constexpr EnumStringDef<unsigned, 2> ElfHeaderMera400FlagsDefs[] = {
+    ENUM_ENT_1(EF_MERA400_LARGE),
+    ENUM_ENT_1(EF_MERA400_SMALL),
+};
+constexpr auto ElfHeaderMera400Flags =
+    BUILD_ENUM_STRINGS(ElfHeaderMera400FlagsDefs);
+
 constexpr EnumStringDef<unsigned, 2> ElfHeaderXtensaFlagsDefs[] = {
     ENUM_ENT_1(EF_XTENSA_MACH_NONE),
     ENUM_ENT_1(EF_XTENSA_XT_INSN),
@@ -3640,6 +3647,8 @@ template <class ELFT> void GNUELFDumper<ELFT>::printFileHeaders() {
   else if (e.e_machine == EM_AVR)
     ElfFlags = printFlags(e.e_flags, EnumStrings(ElfHeaderAVRFlags),
                           unsigned(ELF::EF_AVR_ARCH_MASK));
+  else if (e.e_machine == EM_MERA400_EXPERIMENTAL)
+    ElfFlags = printFlags(e.e_flags, EnumStrings(ElfHeaderMera400Flags));
   else if (e.e_machine == EM_LOONGARCH)
     ElfFlags = printFlags(e.e_flags, EnumStrings(ElfHeaderLoongArchFlags),
                           unsigned(ELF::EF_LOONGARCH_ABI_MODIFIER_MASK),
@@ -7598,6 +7607,8 @@ template <class ELFT> void LLVMELFDumper<ELFT>::printFileHeaders() {
     else if (E.e_machine == EM_AVR)
       W.printFlags("Flags", E.e_flags, EnumStrings(ElfHeaderAVRFlags),
                    unsigned(ELF::EF_AVR_ARCH_MASK));
+    else if (E.e_machine == EM_MERA400_EXPERIMENTAL)
+      W.printFlags("Flags", E.e_flags, EnumStrings(ElfHeaderMera400Flags));
     else if (E.e_machine == EM_LOONGARCH)
       W.printFlags("Flags", E.e_flags, EnumStrings(ElfHeaderLoongArchFlags),
                    unsigned(ELF::EF_LOONGARCH_ABI_MODIFIER_MASK),

@@ -321,6 +321,13 @@ enum : unsigned {
                                     // relaxation to be applied
 };
 
+// MERA-400 e_flags: the memory model the object was built for. An object with
+// neither bit set (such as hand-written assembly) is model-neutral.
+enum : unsigned {
+  EF_MERA400_LARGE = 1, // 32-bit linear byte pointers
+  EF_MERA400_SMALL = 2, // 16-bit byte pointers
+};
+
 // ELF Relocation types for AVR
 enum {
 #include "ELFRelocs/AVR.def"
@@ -513,6 +520,11 @@ enum {
 // ELF Relocation type for Lanai.
 enum {
 #include "ELFRelocs/Lanai.def"
+};
+
+// ELF Relocation types for the experimental MERA-400 target.
+enum {
+#include "ELFRelocs/Mera400.def"
 };
 
 // RISCV Specific e_flags

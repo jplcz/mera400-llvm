@@ -81,6 +81,7 @@ add_clang_library(clangDriver
   ToolChains/MipsLinux.cpp
   ToolChains/MinGW.cpp
   ToolChains/MSP430.cpp
+  ToolChains/Mera400.cpp
   ToolChains/MSVC.cpp
   ToolChains/NetBSD.cpp
   ToolChains/OHOS.cpp

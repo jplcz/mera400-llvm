@@ -261,6 +261,16 @@ TEST(ELFObjectFileTest, MachineTestForMSP430) {
     checkFormatAndArch(Data, Formats[Idx], Triple::msp430);
 }
 
+TEST(ELFObjectFileTest, MachineTestForMera400) {
+  std::array<StringRef, 4> Formats = {"elf32-unknown", "elf32-mera400",
+                                      "elf64-unknown", "elf64-unknown"};
+  std::array<Triple::ArchType, 4> Archs = {Triple::UnknownArch, Triple::mera400,
+                                           Triple::UnknownArch,
+                                           Triple::UnknownArch};
+  for (auto [Idx, Data] : enumerate(generateData(ELF::EM_MERA400_EXPERIMENTAL)))
+    checkFormatAndArch(Data, Formats[Idx], Archs[Idx]);
+}
+
 TEST(ELFObjectFileTest, MachineTestForLoongArch) {
   std::array<StringRef, 4> Formats = {"elf32-loongarch", "elf32-loongarch",
                                       "elf64-loongarch", "elf64-loongarch"};

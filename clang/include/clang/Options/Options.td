@@ -217,6 +217,8 @@ def m_arm_Features_Group : OptionGroup<"<arm features group>">,
                            Group<m_Group>, DocName<"ARM">;
 def m_hexagon_Features_Group : OptionGroup<"<hexagon features group>">,
                                Group<m_Group>, DocName<"Hexagon">;
+def m_mera400_Features_Group : OptionGroup<"<mera400 features group>">,
+                               Group<m_Group>, DocName<"MERA-400">;
 def m_sparc_Features_Group : OptionGroup<"<sparc features group>">,
                                Group<m_Group>, DocName<"SPARC">;
 // The features added by this group will not be added to target features.
@@ -5934,6 +5936,16 @@ def ffixed_r9 : Flag<["-"], "ffixed-r9">, Group<m_Group>,
   HelpText<"Reserve the r9 register (ARM/Hexagon/x86_64 only)">;
 def mno_movt : Flag<["-"], "mno-movt">, Group<m_arm_Features_Group>,
   HelpText<"Disallow use of movt/movw pairs (ARM only)">;
+def mlarge_memory : Flag<["-"], "mlarge-memory">,
+  Group<m_mera400_Features_Group>,
+  HelpText<"Use the large memory model: 32-bit data pointers (MERA-400 only)">;
+def mno_large_memory : Flag<["-"], "mno-large-memory">,
+  Group<m_mera400_Features_Group>,
+  HelpText<"Use the small memory model: 16-bit data pointers (MERA-400 only)">;
+def mawp : Flag<["-"], "mawp">, Group<m_mera400_Features_Group>,
+  HelpText<"Use the AWP floating point instructions (MERA-400 only)">;
+def mno_awp : Flag<["-"], "mno-awp">, Group<m_mera400_Features_Group>,
+  HelpText<"Call library routines for floating point (MERA-400 only)">;
 def mcrc : Flag<["-"], "mcrc">, Group<m_Group>,
   HelpText<"Allow use of CRC instructions (ARM/Mips only)">;
 def mnocrc : Flag<["-"], "mnocrc">, Group<m_arm_Features_Group>,

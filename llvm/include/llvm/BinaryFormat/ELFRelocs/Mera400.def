@@ -1,0 +1,21 @@
+
+#ifndef ELF_RELOC
+#error "ELF_RELOC must be defined"
+#endif
+
+// No relocation
+ELF_RELOC(R_MERA400_NONE,    0)
+// 16-bit value in bytes (S + A)
+ELF_RELOC(R_MERA400_16,      1)
+// 16-bit value in words ((S + A) / 2), the form EMAS label values take
+ELF_RELOC(R_MERA400_WORD16,  2)
+// 7-bit sign-magnitude short branch offset in words ((S + A - P) / 2 - 1)
+ELF_RELOC(R_MERA400_PCREL7,  3)
+// 7-bit sign-magnitude word address of a symbol ((S + A) / 2)
+ELF_RELOC(R_MERA400_WORD7,   4)
+// 32-bit big-endian byte address (S + A), large model byte pointers in data
+ELF_RELOC(R_MERA400_32,      5)
+// High word of a byte address (((S + A) >> 16) & 0xffff), 16-bit signed addend
+ELF_RELOC(R_MERA400_HI16,    6)
+// Low word of a byte address ((S + A) & 0xffff), 16-bit signed addend
+ELF_RELOC(R_MERA400_LO16,    7)

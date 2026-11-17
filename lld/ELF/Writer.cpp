@@ -1653,6 +1653,15 @@ template <class ELFT> void Writer<ELFT>::finalizeAddressDependentContent() {
                << Twine::utohexstr(imageBase) << "); specify --image-base";
     }
 
+    // MERA-400 programs address at most 65536 words (131072 bytes); a linker
+    // is the first place that knows the final layout.
+    if (ctx.arg.emachine == EM_MERA400_EXPERIMENTAL &&
+        (osec->flags & SHF_ALLOC) && osec->addr + osec->size > 0x20000)
+      Err(ctx) << "program too large: section '" << osec->name
+               << "' ends at word address 0x"
+               << Twine::utohexstr((osec->addr + osec->size) / 2)
+               << ", beyond the 65536-word address space";
+
     // If addrExpr is set, the address may not be a multiple of the alignment.
     // Warn because this is error-prone.
     if (osec->addr % osec->addralign != 0)

@@ -504,6 +504,17 @@ std::string Triple::computeDataLayout(StringRef ABIName) const {
   case Triple::mips64:
   case Triple::mips64el:
     return computeMipsDataLayout(*this, ABIName);
+  case Triple::mera400:
+    // The large memory model has 32-bit linear byte pointers.
+    // The large model also places function pointers and virtual tables in
+    // address space 1 (layout fields P and G) so that Clang's 4-byte layout of
+    // them is the real one; Mera400LowerGlobalSpaces undoes that for the
+    // definitions.
+    return ABIName == "large"
+               ? "E-m:e-P1-G1-p:16:16-p1:32:16-i8:8-i16:16-i32:16-i64:16-"
+                 "f32:16-f64:16-a:0:16-n16-S16"
+               : "E-m:e-p:16:16-p1:16:16-i8:8-i16:16-i32:16-i64:16-f32:16-"
+                 "f64:16-a:0:16-n16-S16";
   case Triple::msp430:
     return "e-m:e-p:16:16-i32:16-i64:16-f32:16-f64:16-a:8-n8:16-S16";
   case Triple::ppc:

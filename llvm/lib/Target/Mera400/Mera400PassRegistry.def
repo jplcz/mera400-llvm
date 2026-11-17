@@ -1,0 +1,37 @@
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+// This file is used as the registry of passes that are part of the MERA-400
+// backend.
+//
+//===----------------------------------------------------------------------===//
+
+// NOTE: NO INCLUDE GUARD DESIRED!
+
+#ifndef MODULE_PASS
+#define MODULE_PASS(NAME, CREATE_PASS)
+#endif
+MODULE_PASS("mera400-asm-printer-begin", Mera400AsmPrinterBeginPass())
+MODULE_PASS("mera400-asm-printer-end", Mera400AsmPrinterEndPass())
+MODULE_PASS("mera400-lower-global-spaces", Mera400LowerGlobalSpacesPass())
+MODULE_PASS("mera400-punned-floats", Mera400PunnedFloatsPass())
+#undef MODULE_PASS
+
+#ifndef FUNCTION_PASS
+#define FUNCTION_PASS(NAME, CREATE_PASS)
+#endif
+FUNCTION_PASS("mera400-lower-pointers", Mera400LowerPointersPass())
+#undef FUNCTION_PASS
+
+#ifndef MACHINE_FUNCTION_PASS
+#define MACHINE_FUNCTION_PASS(NAME, CREATE_PASS)
+#endif
+MACHINE_FUNCTION_PASS("mera400-asm-printer", Mera400AsmPrinterPass())
+MACHINE_FUNCTION_PASS("mera400-isel",
+                      Mera400ISelDAGToDAGPass(*this, getOptLevel()))
+#undef MACHINE_FUNCTION_PASS

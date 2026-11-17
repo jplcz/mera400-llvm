@@ -19,6 +19,23 @@ using namespace llvm;
 
 namespace {
 
+TEST(TripleTest, Mera400) {
+  Triple T("mera400-unknown-none");
+  EXPECT_EQ(Triple::mera400, T.getArch());
+  EXPECT_EQ("mera400", Triple::getArchTypeName(T.getArch()));
+  EXPECT_EQ("mera400", Triple::getArchTypePrefix(T.getArch()));
+  EXPECT_EQ(Triple::mera400, Triple::getArchTypeForLLVMName("mera400"));
+  EXPECT_EQ(Triple::ELF, T.getObjectFormat());
+  EXPECT_FALSE(T.isLittleEndian());
+  EXPECT_EQ(FloatABI::Soft, T.getDefaultFloatABI());
+  EXPECT_EQ(0u, T.getArchPointerBitWidth());
+  EXPECT_TRUE(T.computeDataLayout().empty());
+  EXPECT_EQ(Triple::UnknownArch, T.get32BitArchVariant().getArch());
+  EXPECT_EQ(Triple::UnknownArch, T.get64BitArchVariant().getArch());
+  EXPECT_EQ(Triple::mera400, T.getBigEndianArchVariant().getArch());
+  EXPECT_EQ(Triple::UnknownArch, T.getLittleEndianArchVariant().getArch());
+}
+
 TEST(TripleTest, BasicParsing) {
   Triple T;
 

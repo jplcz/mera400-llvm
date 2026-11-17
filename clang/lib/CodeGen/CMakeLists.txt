@@ -148,6 +148,7 @@ add_clang_library(clangCodeGen
   Targets/LoongArch.cpp
   Targets/M68k.cpp
   Targets/MSP430.cpp
+  Targets/Mera400.cpp
   Targets/Mips.cpp
   Targets/NVPTX.cpp
   Targets/PPC.cpp

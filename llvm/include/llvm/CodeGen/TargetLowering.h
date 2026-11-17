@@ -3639,6 +3639,12 @@ public:
     return false;
   }
 
+  /// Return true if a load/op/store of a wide value in address space AS may be
+  /// replaced by one on a narrower part of it, addressed as the same pointer
+  /// plus a byte offset. Targets whose pointers do not count bytes in AS
+  /// return false.
+  virtual bool canNarrowAccessByByteOffset(unsigned AS) const { return true; }
+
   /// Return true if pulling a binary operation into a select with an identity
   /// constant is profitable. This is the inverse of an IR transform.
   /// Example: X + (Cond ? Y : 0) --> Cond ? (X + Y) : X

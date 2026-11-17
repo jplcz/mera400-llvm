@@ -649,6 +649,17 @@ AsmToken AsmLexer::LexSingleQuote() {
   if (LexHLASMStrings)
     return ReturnError(TokStart, "invalid usage of character literals");
 
+  if (LexQuotedCharLiterals) {
+    while (CurChar != '\'') {
+      if (CurChar == '\\')
+        CurChar = getNextChar();
+      if (CurChar == EOF || CurChar == '\n')
+        return ReturnError(TokStart, "unterminated single quote");
+      CurChar = getNextChar();
+    }
+    return AsmToken(AsmToken::String, StringRef(TokStart, CurPtr - TokStart));
+  }
+
   if (LexMasmStrings) {
     while (CurChar != EOF) {
       if (CurChar != '\'') {

@@ -227,5 +227,7 @@ ELF_MACHINE(EM_AIECTRLCODE,   269, "aiectrlcode", "AMD/Xilinx AIEngine ctrlcode"
 ELF_MACHINE(EM_PPU,           270, "ppu", "T-Head PPU")
 ELF_MACHINE(EM_LST,           271, "lst", "Lisuan Technology LST")
 ELF_MACHINE(EM_CHILI,         272, "chili", "OpenAI Chili architecture")
+// Unofficial value for this project's experimental PC-side object format.
+ELF_MACHINE(EM_MERA400_EXPERIMENTAL, 0x4d34, "mera400", "MERA-400 (experimental)")
 #undef ELF_MACHINE
 #endif

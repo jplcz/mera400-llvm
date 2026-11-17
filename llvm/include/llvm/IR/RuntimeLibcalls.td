@@ -75,6 +75,7 @@ def IsAVR : LibcallPredicate<[{TT.getArch() == Triple::avr}]>;
 def IsDXIL : LibcallPredicate<[{TT.isDXIL()}]>;
 def IsHexagon : LibcallPredicate<[{TT.getArch() == Triple::hexagon}]>;
 def IsLanai : LibcallPredicate<[{TT.getArch() == Triple::lanai}]>;
+def IsMera400 : LibcallPredicate<[{TT.getArch() == Triple::mera400}]>;
 def IsMSP430 : LibcallPredicate<[{TT.getArch() == Triple::msp430}]>;
 def IsNVPTX : LibcallPredicate<[{TT.isNVPTX()}]>;
 
@@ -3283,6 +3284,21 @@ def LanaiSystemLibrary
                             "libm", "libc", "unwind"]> {
   let DefaultLibcallCallingConv = FASTCC;
 }
+
+//===----------------------------------------------------------------------===//
+// Mera400 Runtime Libcalls
+//===----------------------------------------------------------------------===//
+
+// The compiler emits calls to the compiler-rt names (shifts, multiply,
+// divide and remainder of 16, 32 and 64 bits) and, for memory intrinsics that
+// are not expanded inline, to the C library's memcpy, memmove and memset
+// (with byte pointers); the runtime and the C library are supplied
+// separately. The generic passes use the "libc" entry only to learn that
+// those calls exist, so they do not expand large copies into loops.
+def isMera400 : RuntimeLibcallAvailability<(all_of IsMera400)>;
+
+def Mera400SystemLibrary
+    : SystemRuntimeLibrary<isMera400, ["compiler-rt", "libc"]>;
 
 //===----------------------------------------------------------------------===//
 // Mips16 Runtime Libcalls

@@ -67,6 +67,7 @@ class AsmLexer {
   bool LexMasmHexFloats = false;
   bool LexMasmIntegers = false;
   bool LexMasmStrings = false;
+  bool LexQuotedCharLiterals = false;
   bool LexMotorolaIntegers = false;
   bool UseMasmDefaultRadix = false;
   unsigned DefaultRadix = 10;
@@ -179,6 +180,11 @@ public:
   /// Set whether to lex masm-style string literals, such as 'Can''t find file'
   /// and "This ""value"" not found".
   void setLexMasmStrings(bool V) { LexMasmStrings = V; }
+
+  /// Set whether to lex single-quoted literals of any length as raw String
+  /// tokens (backslash escapes the next character), leaving the decoding of
+  /// the contents to the target parser.
+  void setLexQuotedCharLiterals(bool V) { LexQuotedCharLiterals = V; }
 
   /// Set whether to lex Motorola-style integer literals, such as $deadbeef or
   /// %01010110.

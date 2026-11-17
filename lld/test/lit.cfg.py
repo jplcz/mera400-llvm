@@ -80,6 +80,7 @@ llvm_config.feature_config(
                 "AVR": "avr",
                 "Hexagon": "hexagon",
                 "LoongArch": "loongarch",
+                "Mera400": "mera400",
                 "Mips": "mips",
                 "MSP430": "msp430",
                 "NVPTX": "nvptx",

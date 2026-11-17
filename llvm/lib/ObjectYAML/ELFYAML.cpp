@@ -731,6 +731,9 @@ void ScalarEnumerationTraits<ELFYAML::ELF_REL>::enumeration(
   case ELF::EM_LANAI:
 #include "llvm/BinaryFormat/ELFRelocs/Lanai.def"
     break;
+  case ELF::EM_MERA400_EXPERIMENTAL:
+#include "llvm/BinaryFormat/ELFRelocs/Mera400.def"
+    break;
   case ELF::EM_AMDGPU:
 #include "llvm/BinaryFormat/ELFRelocs/AMDGPU.def"
     break;

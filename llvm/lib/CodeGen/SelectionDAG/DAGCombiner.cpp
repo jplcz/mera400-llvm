@@ -23194,6 +23194,8 @@ ShrinkLoadReplaceStoreWithStore(const std::pair<unsigned, unsigned> &MaskInfo,
     return SDValue();
 
   // Check that the target doesn't think this is a bad idea.
+  if (!TLI.canNarrowAccessByByteOffset(St->getAddressSpace()))
+    return SDValue();
   if (St->getMemOperand() &&
       !TLI.allowsMemoryAccess(*DAG.getContext(), DAG.getDataLayout(), VT,
                               *St->getMemOperand()))
@@ -23282,7 +23284,8 @@ SDValue DAGCombiner::ReduceLoadOpStoreWidth(SDNode *N) {
         return NewST;
   }
 
-  if (!Opts.combiner_reduce_load_op_store_width)
+  if (!Opts.combiner_reduce_load_op_store_width ||
+      !TLI.canNarrowAccessByByteOffset(ST->getAddressSpace()))
     return SDValue();
 
   if (Value.getOperand(1).getOpcode() != ISD::Constant)

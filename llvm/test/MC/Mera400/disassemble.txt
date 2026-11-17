@@ -1,0 +1,59 @@
+# REQUIRES: mera400-registered-target
+# RUN: llvm-mc -triple=mera400-unknown-none -disassemble %s 2>%t.err | FileCheck %s --check-prefix=CHECK
+# RUN: FileCheck %s --check-prefix=WARN3 --input-file=%t.err
+# RUN: llvm-mc -triple=mera400-unknown-none -mcpu=mx16 -disassemble %s 2>%t.err | FileCheck %s --check-prefixes=CHECK,MX16
+# RUN: FileCheck %s --check-prefix=WARN2 --input-file=%t.err
+
+# Words that are not instructions are reported on standard error. "-0" has no
+# assembly spelling, "sint" is MX-16 only and the last word is truncated.
+# WARN3-COUNT-3: warning: invalid instruction encoding
+# WARN2-COUNT-2: warning: invalid instruction encoding
+
+# Short arguments are sign-magnitude.
+# CHECK: lwt r2, -1
+0xd6 0x81
+# CHECK-NEXT: awt r3, -63
+0xc2 0xff
+# CHECK-NEXT: nop
+0xe0 0x00
+# CHECK-NEXT: ujs -1
+0xe2 0x01
+# CHECK-NEXT: irb r1, 5
+0xc8 0x45
+0xd6 0x00
+
+# One-word normal arguments: rC, rC+rB, indirect.
+# CHECK-NEXT: lw r1, r1
+0x40 0x41
+# CHECK-NEXT: ib [r6+r7]
+0xff 0xfe
+# Two-word form: C = 0, the value follows.
+# CHECK-NEXT: lw r1, 5
+0x40 0x40 0x00 0x05
+# CHECK-NEXT: is r4, [-3+r2]
+0x5f 0x10 0xff 0xfd
+# CHECK-NEXT: uj 4660
+0xf0 0x00 0x12 0x34
+
+# Register, shift and byte instructions.
+# CHECK-NEXT: slz r3
+0xe8 0xc4
+# CHECK-NEXT: rky r1
+0xea 0x40
+# CHECK-NEXT: shc r0, -8
+0xea 0x10
+# CHECK-NEXT: hlt 64
+0xee 0x00
+# CHECK-NEXT: blc 65280
+0xe4 0xff
+# CHECK-NEXT: nrf 255
+0xe7 0xff
+# CHECK-NEXT: mcl
+0xec 0x40
+
+# MX-16 instructions only decode with -mcpu=mx16.
+# MX16-NEXT: sint
+0xec 0x84
+
+# A two-word instruction with a missing second word is invalid.
+0x40 0x40
