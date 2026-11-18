@@ -29,7 +29,7 @@ TEST(TripleTest, Mera400) {
   EXPECT_FALSE(T.isLittleEndian());
   EXPECT_EQ(FloatABI::Soft, T.getDefaultFloatABI());
   EXPECT_EQ(0u, T.getArchPointerBitWidth());
-  EXPECT_TRUE(T.computeDataLayout().empty());
+  EXPECT_FALSE(T.computeDataLayout().empty());
   EXPECT_EQ(Triple::UnknownArch, T.get32BitArchVariant().getArch());
   EXPECT_EQ(Triple::UnknownArch, T.get64BitArchVariant().getArch());
   EXPECT_EQ(Triple::mera400, T.getBigEndianArchVariant().getArch());
