@@ -209,3 +209,116 @@ void mera400::Linker::ConstructJob(Compilation &C, const JobAction &JA,
       JA, *this, ResponseFileSupport::AtFileCurCP(), Args.MakeArgString(Linker),
       CmdArgs, Inputs, Output));
 }
+
+// ---------------------------------------------------------------------------
+// CROOK. The same sysroot layout, with crt0-crook.o, crook.ld and libcrook.a
+// (see the mera400-libc project). Sizes are given in words, as CROOK counts
+// them; the linker script works in bytes.
+// ---------------------------------------------------------------------------
+
+Tool *CrookToolChain::buildLinker() const {
+  return new tools::crook::Linker(*this);
+}
+
+// Adds --defsym=<Symbol>=<2 * words> for the option, or for the default when
+// the option is absent. The value must be a plain non-negative integer.
+static void addCrookDefsym(const Driver &D, const ArgList &Args,
+                           ArgStringList &CmdArgs, options::ID Opt,
+                           StringRef Symbol, uint64_t DefaultWords) {
+  uint64_t Words = DefaultWords;
+  if (const Arg *A = Args.getLastArg(Opt)) {
+    unsigned Value;
+    if (StringRef(A->getValue()).getAsInteger(0, Value))
+      D.Diag(diag::err_drv_invalid_int_value)
+          << A->getAsString(Args) << A->getValue();
+    else
+      Words = Value;
+  }
+  CmdArgs.push_back(
+      Args.MakeArgString("--defsym=" + Symbol + "=" + Twine(Words * 2)));
+}
+
+void crook::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+                                 const InputInfo &Output,
+                                 const InputInfoList &Inputs,
+                                 const ArgList &Args,
+                                 const char *LinkingOutput) const {
+  const ToolChain &TC = getToolChain();
+  const Driver &D = TC.getDriver();
+  std::string Linker = TC.GetProgramPath(getShortName());
+  ArgStringList CmdArgs;
+
+  bool IsRelocatable = Args.hasArg(options::OPT_r);
+  bool UseStartFiles =
+      !Args.hasArg(options::OPT_nostdlib, options::OPT_nostartfiles) &&
+      !IsRelocatable;
+  bool UseLibs = !Args.hasArg(options::OPT_nostdlib, options::OPT_nodefaultlibs,
+                              options::OPT_nolibc) &&
+                 !IsRelocatable;
+
+  CmdArgs.push_back("-m");
+  CmdArgs.push_back("mera400elf");
+
+  Args.addAllArgs(CmdArgs, {options::OPT_s, options::OPT_t, options::OPT_u,
+                            options::OPT_r});
+
+  // CROOK starts a program at the first word of its image: crt0-crook first.
+  if (UseStartFiles) {
+    std::string Crt0 = findLibraryFile(TC, Args, "crt0-crook.o");
+    if (Crt0.empty())
+      D.Diag(diag::err_drv_no_such_file)
+          << "crt0-crook.o (give the C library with --sysroot or -L, or use "
+             "-nostartfiles)";
+    else
+      CmdArgs.push_back(Args.MakeArgString(Crt0));
+  }
+
+  // The image parameters. They must precede -T: a plain assignment in a
+  // linker script replaces an earlier --defsym, while PROVIDE() in crook.ld
+  // only supplies a default when the symbol is not defined yet.
+  if (!IsRelocatable) {
+    addCrookDefsym(D, Args, CmdArgs, options::OPT_mcrook_base_EQ,
+                   "__image_base", 0);
+    addCrookDefsym(D, Args, CmdArgs, options::OPT_mcrook_image_EQ,
+                   "__image_size", 8192);
+    addCrookDefsym(D, Args, CmdArgs, options::OPT_mcrook_stack_EQ,
+                   "__stack_size", 512);
+  }
+
+  Args.AddAllArgs(CmdArgs, options::OPT_L);
+  TC.AddFilePathLibArgs(Args, CmdArgs);
+  AddLinkerInputs(TC, Inputs, Args, CmdArgs, JA);
+
+  if (UseStartFiles && !Args.hasArg(options::OPT_T)) {
+    std::string Script = findLibraryFile(TC, Args, "crook.ld");
+    if (Script.empty())
+      D.Diag(diag::err_drv_no_such_file)
+          << "crook.ld (give the C library with --sysroot or -L, or use "
+             "-nostartfiles)";
+    else {
+      CmdArgs.push_back("-T");
+      CmdArgs.push_back(Args.MakeArgString(Script));
+    }
+  }
+  if (!IsRelocatable)
+    CmdArgs.push_back("--gc-sections");
+
+  if (UseLibs) {
+    CmdArgs.push_back("-lcrook");
+    CmdArgs.push_back("-lc");
+    CmdArgs.push_back("-lbuiltins");
+  }
+
+  Args.AddAllArgs(CmdArgs, options::OPT_T);
+
+  // A file name ending in .bin asks for the raw memory image CROOK loads.
+  StringRef OutName = Output.getFilename();
+  if (!IsRelocatable && OutName.ends_with(".bin"))
+    CmdArgs.push_back("--oformat=binary");
+  CmdArgs.push_back("-o");
+  CmdArgs.push_back(Output.getFilename());
+
+  C.addCommand(std::make_unique<Command>(
+      JA, *this, ResponseFileSupport::AtFileCurCP(), Args.MakeArgString(Linker),
+      CmdArgs, Inputs, Output));
+}

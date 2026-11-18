@@ -5946,6 +5946,15 @@ def mawp : Flag<["-"], "mawp">, Group<m_mera400_Features_Group>,
   HelpText<"Use the AWP floating point instructions (MERA-400 only)">;
 def mno_awp : Flag<["-"], "mno-awp">, Group<m_mera400_Features_Group>,
   HelpText<"Call library routines for floating point (MERA-400 only)">;
+def mcrook_base_EQ : Joined<["-"], "mcrook-base=">,
+  Group<m_mera400_Features_Group>, MetaVarName<"<words>">,
+  HelpText<"Word address of the first word of a CROOK program image (default 0; MERA-400 CROOK only)">;
+def mcrook_image_EQ : Joined<["-"], "mcrook-image=">,
+  Group<m_mera400_Features_Group>, MetaVarName<"<words>">,
+  HelpText<"Size of a CROOK program image in words, including .bss, heap and stack (default 8192; MERA-400 CROOK only)">;
+def mcrook_stack_EQ : Joined<["-"], "mcrook-stack=">,
+  Group<m_mera400_Features_Group>, MetaVarName<"<words>">,
+  HelpText<"Words reserved for the stack at the top of a CROOK program image (default 512; MERA-400 CROOK only)">;
 def mcrc : Flag<["-"], "mcrc">, Group<m_Group>,
   HelpText<"Allow use of CRC instructions (ARM/Mips only)">;
 def mnocrc : Flag<["-"], "mnocrc">, Group<m_arm_Features_Group>,

@@ -164,6 +164,10 @@ void Mera400TargetInfo::getTargetDefines(const LangOptions &Opts,
                                          MacroBuilder &Builder) const {
   Builder.defineMacro("__mera400__");
   Builder.defineMacro("__MERA400__");
+  if (getTriple().isOSCROOK()) {
+    Builder.defineMacro("__crook__");
+    Builder.defineMacro("__CROOK__");
+  }
   // The generic __BYTE_ORDER__ is defined by Clang itself; this is the
   // spelling some portable code tests for.
   Builder.defineMacro("__BIG_ENDIAN__");

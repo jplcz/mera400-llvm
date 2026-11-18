@@ -34,6 +34,17 @@ TEST(TripleTest, Mera400) {
   EXPECT_EQ(Triple::UnknownArch, T.get64BitArchVariant().getArch());
   EXPECT_EQ(Triple::mera400, T.getBigEndianArchVariant().getArch());
   EXPECT_EQ(Triple::UnknownArch, T.getLittleEndianArchVariant().getArch());
+
+  // CROOK, the MERA-400 operating system: same architecture and layout.
+  Triple C("mera400-unknown-crook");
+  EXPECT_EQ(Triple::mera400, C.getArch());
+  EXPECT_EQ(Triple::CROOK, C.getOS());
+  EXPECT_TRUE(C.isOSCROOK());
+  EXPECT_FALSE(T.isOSCROOK());
+  EXPECT_EQ("crook", C.getOSName());
+  EXPECT_EQ("mera400-unknown-crook", Triple::normalize("mera400-unknown-crook"));
+  EXPECT_EQ(Triple::ELF, C.getObjectFormat());
+  EXPECT_EQ(T.computeDataLayout(), C.computeDataLayout());
 }
 
 TEST(TripleTest, BasicParsing) {

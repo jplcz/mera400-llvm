@@ -6431,7 +6431,12 @@ const ToolChain &Driver::getToolChain(const ArgList &Args,
         TC = std::make_unique<toolchains::MSP430ToolChain>(*this, Target, Args);
         break;
       case llvm::Triple::mera400:
-        TC = std::make_unique<toolchains::Mera400ToolChain>(*this, Target, Args);
+        if (Target.isOSCROOK())
+          TC = std::make_unique<toolchains::CrookToolChain>(*this, Target,
+                                                            Args);
+        else
+          TC = std::make_unique<toolchains::Mera400ToolChain>(*this, Target,
+                                                              Args);
         break;
       case llvm::Triple::riscv32:
       case llvm::Triple::riscv64:

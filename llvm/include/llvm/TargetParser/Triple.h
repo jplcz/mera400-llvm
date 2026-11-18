@@ -353,7 +353,8 @@ public:
     Firmware,
     QURT,
     H2,
-    LastOSType = H2
+    CROOK, // CROOK, the operating system of the MERA-400
+    LastOSType = CROOK
   };
   enum EnvironmentType {
     UnknownEnvironment,
@@ -864,6 +865,9 @@ public:
 
   /// Tests whether the OS is H2.
   bool isOSH2() const { return getOS() == Triple::H2; }
+
+  /// Tests whether the OS is CROOK.
+  bool isOSCROOK() const { return getOS() == Triple::CROOK; }
 
   /// Tests whether the OS uses the ELF binary format.
   bool isOSBinFormatELF() const { return getObjectFormat() == Triple::ELF; }
