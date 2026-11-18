@@ -9,6 +9,25 @@
 // RUN:   -mcrook-image=lots %s 2>&1 | FileCheck -check-prefix=BAD %s
 // RUN: not %clang -### --target=mera400-unknown-none --sysroot=%S/Inputs/mera400_tree \
 // RUN:   -mcrook-base=2 %s 2>&1 | FileCheck -check-prefix=NONE %s
+// RUN: %clang -### --target=mera400-unknown-crook --sysroot=%S/Inputs/mera400_tree \
+// RUN:   %s 2>&1 | FileCheck -check-prefix=VER5 %s
+// RUN: %clang -### --target=mera400-unknown-crook --sysroot=%S/Inputs/mera400_tree \
+// RUN:   -mcrook-version=4 %s 2>&1 | FileCheck -check-prefix=VER4 %s
+// RUN: %clang -### --target=mera400-unknown-crook --sysroot=%S/Inputs/mera400_tree \
+// RUN:   -mcrook-version=4 -mcrook-version=5 %s 2>&1 | FileCheck -check-prefix=VER5 %s
+// RUN: not %clang -### --target=mera400-unknown-crook --sysroot=%S/Inputs/mera400_tree \
+// RUN:   -mcrook-version=3 %s 2>&1 | FileCheck -check-prefix=VERBAD %s
+// RUN: not %clang -### --target=mera400-unknown-crook --sysroot=%S/Inputs/mera400_tree \
+// RUN:   -mcrook-version=4x %s 2>&1 | FileCheck -check-prefix=VERBAD4X %s
+// RUN: not %clang -### --target=mera400-unknown-none --sysroot=%S/Inputs/mera400_tree \
+// RUN:   -mcrook-version=4 %s 2>&1 | FileCheck -check-prefix=VERNONE %s
+
+// The CROOK version (4 or 5, default 5) becomes the __CROOK_VERSION__ macro.
+// VER5: "-cc1" {{.*}}"-D__CROOK_VERSION__=5"
+// VER4: "-cc1" {{.*}}"-D__CROOK_VERSION__=4"
+// VERBAD: invalid value '3' in '-mcrook-version=3'
+// VERBAD4X: invalid value '4x' in '-mcrook-version=4x'
+// VERNONE: unsupported option '-mcrook-version=' for target 'mera400-unknown-none'
 
 // The CROOK toolchain: crt0-crook.o first, then the user's objects, the
 // image parameters in bytes (twice the words; the defaults are 0, 8192 and

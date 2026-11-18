@@ -59,8 +59,12 @@ protected:
 class LLVM_LIBRARY_VISIBILITY CrookToolChain : public Mera400ToolChain {
 public:
   CrookToolChain(const Driver &D, const llvm::Triple &Triple,
-                 const llvm::opt::ArgList &Args)
-      : Mera400ToolChain(D, Triple, Args) {}
+                 const llvm::opt::ArgList &Args);
+
+  /// Adds -D__CROOK_VERSION__=<4 or 5> (-mcrook-version=, default 5).
+  void addClangTargetOptions(const llvm::opt::ArgList &DriverArgs,
+                             llvm::opt::ArgStringList &CC1Args, BoundArch BA,
+                             Action::OffloadKind) const override;
 
 protected:
   Tool *buildLinker() const override;

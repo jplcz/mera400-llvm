@@ -216,6 +216,35 @@ void mera400::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 // them; the linker script works in bytes.
 // ---------------------------------------------------------------------------
 
+// The CROOK version the program is built for: 4 or 5. Only CROOK-5 has the
+// GMEM, RMEM and LRAM extracodes. Returns 0 for an invalid value.
+static unsigned getCrookVersion(const ArgList &Args) {
+  const Arg *A = Args.getLastArg(options::OPT_mcrook_version_EQ);
+  if (!A)
+    return 5;
+  StringRef V = A->getValue();
+  return V == "4" ? 4 : V == "5" ? 5 : 0;
+}
+
+CrookToolChain::CrookToolChain(const Driver &D, const llvm::Triple &Triple,
+                               const ArgList &Args)
+    : Mera400ToolChain(D, Triple, Args) {
+  if (!getCrookVersion(Args))
+    D.Diag(diag::err_drv_invalid_value)
+        << Args.getLastArg(options::OPT_mcrook_version_EQ)->getAsString(Args)
+        << Args.getLastArgValue(options::OPT_mcrook_version_EQ);
+}
+
+void CrookToolChain::addClangTargetOptions(const ArgList &DriverArgs,
+                                           ArgStringList &CC1Args,
+                                           BoundArch BA,
+                                           Action::OffloadKind OK) const {
+  Mera400ToolChain::addClangTargetOptions(DriverArgs, CC1Args, BA, OK);
+  if (unsigned Version = getCrookVersion(DriverArgs))
+    CC1Args.push_back(
+        DriverArgs.MakeArgString("-D__CROOK_VERSION__=" + Twine(Version)));
+}
+
 Tool *CrookToolChain::buildLinker() const {
   return new tools::crook::Linker(*this);
 }

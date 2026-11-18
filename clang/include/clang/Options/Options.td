@@ -5952,6 +5952,9 @@ def mcrook_base_EQ : Joined<["-"], "mcrook-base=">,
 def mcrook_image_EQ : Joined<["-"], "mcrook-image=">,
   Group<m_mera400_Features_Group>, MetaVarName<"<words>">,
   HelpText<"Size of a CROOK program image in words, including .bss, heap and stack (default 8192; MERA-400 CROOK only)">;
+def mcrook_version_EQ : Joined<["-"], "mcrook-version=">,
+  Group<m_mera400_Features_Group>, MetaVarName<"<4|5>">,
+  HelpText<"CROOK operating system version to build for; defines __CROOK_VERSION__ (default 5; MERA-400 CROOK only)">;
 def mcrook_stack_EQ : Joined<["-"], "mcrook-stack=">,
   Group<m_mera400_Features_Group>, MetaVarName<"<words>">,
   HelpText<"Words reserved for the stack at the top of a CROOK program image (default 512; MERA-400 CROOK only)">;
