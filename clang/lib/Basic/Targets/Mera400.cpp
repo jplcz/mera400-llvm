@@ -33,6 +33,7 @@ Mera400TargetInfo::Mera400TargetInfo(const llvm::Triple &Triple,
   IntWidth = IntAlign = 16;
   LongWidth = 32;
   LongLongWidth = 64;
+  MaxBitIntWidth = 64;
   // The machine word is 16 bits: nothing is ever aligned more strictly.
   LongAlign = LongLongAlign = 16;
   SuitableAlign = 16;

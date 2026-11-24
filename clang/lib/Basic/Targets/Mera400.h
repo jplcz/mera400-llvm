@@ -60,6 +60,10 @@ public:
 
   bool allowsLargerPreferedTypeAlignment() const override { return false; }
 
+  // Generic legalization expands wide integers, so _BitInt works up to the
+  // widest integer the target already handles (64 bits).
+  bool hasBitIntType() const override { return true; }
+
   // String literals and other constants are globals, which live in address
   // space 0 like every other global (see Mera400TargetCodeGenInfo).
   std::optional<LangAS> getConstantAddressSpace() const override {
