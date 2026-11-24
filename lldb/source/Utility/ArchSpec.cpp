@@ -172,6 +172,12 @@ static constexpr const CoreDefinition g_core_definitions[] = {
     {eByteOrderLittle, 2, 2, 4, llvm::Triple::msp430, ArchSpec::eCore_msp430,
      "msp430"},
 
+    // MERA-400: big-endian, instructions of 1 or 2 16-bit words. Addresses
+    // are byte addresses of 4 bytes in the DWARF/ELF view in both memory
+    // models.
+    {eByteOrderBig, 4, 2, 4, llvm::Triple::mera400, ArchSpec::eCore_mera400,
+     "mera400"},
+
     {eByteOrderBig, 4, 4, 4, llvm::Triple::ppc, ArchSpec::eCore_ppc_generic,
      "powerpc"},
     {eByteOrderBig, 4, 4, 4, llvm::Triple::ppc, ArchSpec::eCore_ppc_ppc601,
@@ -420,6 +426,7 @@ static const ArchDefinitionEntry g_elf_arch_entries[] = {
     {ArchSpec::eCore_mips64r2el,      llvm::ELF::EM_MIPS,       ArchSpec::eMIPSSubType_mips64r2el}, // mips64r2el
     {ArchSpec::eCore_mips64r6el,      llvm::ELF::EM_MIPS,       ArchSpec::eMIPSSubType_mips64r6el}, // mips64r6el
     {ArchSpec::eCore_msp430,          llvm::ELF::EM_MSP430      }, // MSP430
+    {ArchSpec::eCore_mera400,         llvm::ELF::EM_MERA400_EXPERIMENTAL}, // MERA-400
     {ArchSpec::eCore_hexagon_generic, llvm::ELF::EM_HEXAGON     }, // HEXAGON
     {ArchSpec::eCore_arc,             llvm::ELF::EM_ARC_COMPACT2}, // ARC
     {ArchSpec::eCore_avr,             llvm::ELF::EM_AVR         }, // AVR

@@ -1,0 +1,30 @@
+# RUN: yaml2obj %s -o %t
+# RUN: lldb-test object-file %t | FileCheck %s
+# REQUIRES: mera400
+
+# CHECK: Plugin name: elf
+# CHECK: Architecture: mera400--
+# CHECK: Executable: true
+# CHECK: Type: executable
+# CHECK: Name: .text
+# CHECK-NEXT: Type: code
+# CHECK-NEXT: Permissions: r-x
+# CHECK: VM address: 0x100
+# CHECK: VM size: 4
+
+--- !ELF
+FileHeader:
+  Class:   ELFCLASS32
+  Data:    ELFDATA2MSB
+  Type:    ET_EXEC
+  Machine: EM_MERA400_EXPERIMENTAL
+  Flags:   [ ]
+  Entry:   0x100
+Sections:
+  - Name:         .text
+    Type:         SHT_PROGBITS
+    Flags:        [ SHF_ALLOC, SHF_EXECINSTR ]
+    Address:      0x100
+    AddressAlign: 0x2
+    Content:      '40454041'
+...

@@ -1,0 +1,35 @@
+# REQUIRES: mera400
+# Static support: LLDB recognises a MERA-400 ELF file and disassembles it
+# without a running process.
+# RUN: yaml2obj %s -o %t
+# RUN: %lldb %t -b -o "disassemble -n add" -o "disassemble -s 0x100 -c 2 -b" \
+# RUN:   | FileCheck %s
+
+# CHECK: (mera400)
+# CHECK: `add:
+# CHECK: [0x100] <+0>: aw     r1, r2
+# CHECK: [0x102] <+2>: uj     r4
+# CHECK: [0x100] <+0>: 80 42  aw     r1, r2
+
+--- !ELF
+FileHeader:
+  Class:   ELFCLASS32
+  Data:    ELFDATA2MSB
+  Type:    ET_EXEC
+  Machine: EM_MERA400_EXPERIMENTAL
+  Entry:   0x100
+Sections:
+  - Name:         .text
+    Type:         SHT_PROGBITS
+    Flags:        [ SHF_ALLOC, SHF_EXECINSTR ]
+    Address:      0x100
+    AddressAlign: 0x2
+    Content:      '8042F004'
+Symbols:
+  - Name:    add
+    Type:    STT_FUNC
+    Section: .text
+    Value:   0x100
+    Size:    4
+    Binding: STB_GLOBAL
+...
