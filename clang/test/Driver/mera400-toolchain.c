@@ -2,6 +2,8 @@
 // RUN:   -mlarge-memory -mawp -mcpu=mx16 -Lextra %s 2>&1 \
 // RUN:   | FileCheck %s
 // RUN: %clang -### --target=mera400-unknown-none --sysroot=%S/Inputs/mera400_tree %s \
+// RUN:   -o small 2>&1 | FileCheck -check-prefix=SMALL %s
+// RUN: %clang -### --target=mera400-unknown-none --sysroot=%S/Inputs/mera400_tree %s \
 // RUN:   -nostdlib 2>&1 | FileCheck -check-prefix=NOSTDLIB %s
 // RUN: not %clang --target=mera400-unknown-none -frtti -fsyntax-only %s 2>&1 \
 // RUN:   | FileCheck -check-prefix=RTTI %s
@@ -20,10 +22,16 @@
 // The start-up code is linked first, then the library directories, the user's
 // objects and linker options, the linker script (after the user's --defsym,
 // see the driver) and finally the libraries.
-// CHECK: "{{.*}}ld.lld" "-m" "mera400elf" "{{.*}}mera400_tree{{/|\\\\}}lib{{/|\\\\}}crt0.o"
-// CHECK-SAME: "-Lextra" "-L{{.*}}mera400_tree{{/|\\\\}}lib"
-// CHECK-SAME: "-T" "{{.*}}mera400.ld"
+// The large memory model uses lib/large of the sysroot.
+// CHECK: "{{.*}}ld.lld" "-m" "mera400elf" "{{.*}}mera400_tree{{/|\\\\}}lib{{/|\\\\}}large{{/|\\\\}}crt0.o"
+// CHECK-SAME: "-Lextra" "-L{{.*}}mera400_tree{{/|\\\\}}lib{{/|\\\\}}large"
+// CHECK-SAME: "-T" "{{.*}}large{{/|\\\\}}mera400.ld"
 // CHECK-SAME: "-lc" "-lbuiltins" "-o" "a.out"
+
+// The small model uses lib of the sysroot.
+// SMALL: "{{.*}}mera400_tree{{/|\\\\}}lib{{/|\\\\}}crt0.o"
+// SMALL-SAME: "-L{{.*}}mera400_tree{{/|\\\\}}lib"
+// SMALL-NOT: large
 
 // NOSTDLIB: "{{.*}}ld.lld" "-m" "mera400elf"
 // NOSTDLIB-NOT: crt0.o

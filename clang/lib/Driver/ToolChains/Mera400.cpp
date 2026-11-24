@@ -38,12 +38,22 @@ using namespace clang::driver::tools;
 using namespace clang;
 using namespace llvm::opt;
 
+// The library directory of the sysroot: lib for the small memory model and
+// lib/large for the large one. The two models use different pointer sizes, so
+// their start-up code and archives can never be mixed.
+static SmallString<128> getLibDir(StringRef SysRoot, const ArgList &Args) {
+  SmallString<128> Lib(SysRoot);
+  llvm::sys::path::append(Lib, "lib");
+  if (Args.hasFlag(options::OPT_mlarge_memory, options::OPT_mno_large_memory,
+                   false))
+    llvm::sys::path::append(Lib, "large");
+  return Lib;
+}
+
 Mera400ToolChain::Mera400ToolChain(const Driver &D, const llvm::Triple &Triple,
                                    const ArgList &Args)
     : Generic_ELF(D, Triple, Args) {
-  SmallString<128> Lib(computeSysRoot());
-  llvm::sys::path::append(Lib, "lib");
-  addPathIfExists(D, Lib, getFilePaths());
+  addPathIfExists(D, getLibDir(computeSysRoot(), Args), getFilePaths());
 }
 
 std::string Mera400ToolChain::computeSysRoot() const {
@@ -130,14 +140,13 @@ Tool *Mera400ToolChain::buildLinker() const {
 }
 
 // Finds a file of the C library: in the -L directories first (so that a user
-// can override a file), then in <sysroot>/lib. An empty string if not found.
+// can override a file), then in the sysroot's library directory (lib or
+// lib/large). An empty string if not found.
 static std::string findLibraryFile(const ToolChain &TC, const ArgList &Args,
                                    StringRef Name) {
   std::vector<std::string> Dirs = Args.getAllArgValues(options::OPT_L);
-  SmallString<128> Lib(
-      static_cast<const Mera400ToolChain &>(TC).computeSysRoot());
-  llvm::sys::path::append(Lib, "lib");
-  Dirs.push_back(std::string(Lib));
+  Dirs.push_back(std::string(getLibDir(
+      static_cast<const Mera400ToolChain &>(TC).computeSysRoot(), Args)));
   for (const std::string &Dir : Dirs) {
     SmallString<128> Path(Dir);
     llvm::sys::path::append(Path, Name);
