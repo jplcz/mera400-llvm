@@ -120,7 +120,7 @@ _Tm __convert_to_tm(chrono::tai_time<_Duration> __tp) {
   // The time between the TAI epoch (1958-01-01) and UNIX epoch (1970-01-01).
   // This avoids leap second conversion when going from TAI to UTC.
   // (It also avoids issues when the date is before the UTC epoch.)
-  constexpr chrono::seconds __offset{4383 * 24 * 60 * 60};
+  constexpr chrono::seconds __offset{4383L * 24 * 60 * 60};
   return std::__convert_to_tm<_Tm>(chrono::sys_time<_Rp>{__tp.time_since_epoch() - __offset});
 }
 
@@ -128,7 +128,7 @@ template <class _Tm, class _Duration>
 _Tm __convert_to_tm(chrono::gps_time<_Duration> __tp) {
   using _Rp = common_type_t<_Duration, chrono::seconds>;
   // The time between the GPS epoch (1980-01-06) and UNIX epoch (1970-01-01).
-  constexpr chrono::seconds __offset{3657 * 24 * 60 * 60};
+  constexpr chrono::seconds __offset{3657L * 24 * 60 * 60};
   return std::__convert_to_tm<_Tm>(chrono::sys_time<_Rp>{__tp.time_since_epoch() + __offset});
 }
 
