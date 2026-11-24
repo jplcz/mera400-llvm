@@ -1,0 +1,125 @@
+# Built with: clang --target=mera400 -g -O0 -c f.c; ld.lld -e main f.o; obj2yaml
+# int add(int a, int b) { return a + b; }
+# long wide(void) { return 0x12345678L; }
+# double dbl(void) { return 1.5; }
+# int main(void) { return add(1, 2) + (int)wide(); }
+--- !ELF
+FileHeader:
+  Class:           ELFCLASS32
+  Data:            ELFDATA2MSB
+  Type:            ET_EXEC
+  Machine:         EM_MERA400_EXPERIMENTAL
+  Flags:           [  ]
+  Entry:           0xDC
+ProgramHeaders:
+  - Type:            PT_PHDR
+    Flags:           [ PF_R ]
+    VAddr:           0x34
+    Align:           0x4
+    Offset:          0x34
+  - Type:            PT_LOAD
+    Flags:           [ PF_R ]
+    Align:           0x4
+    Offset:          0x0
+  - Type:            PT_LOAD
+    Flags:           [ PF_X, PF_R ]
+    FirstSec:        .text
+    LastSec:         .text
+    VAddr:           0xB4
+    Align:           0x4
+    Offset:          0xB4
+  - Type:            PT_GNU_STACK
+    Flags:           [ PF_W, PF_R ]
+    Align:           0x0
+    Offset:          0x0
+Sections:
+  - Name:            .text
+    Type:            SHT_PROGBITS
+    Flags:           [ SHF_ALLOC, SHF_EXECINSTR ]
+    Address:         0xB4
+    AddressAlign:    0x4
+    Content:         C3C25078000150874478000144878042C1C2F0044040123440805678F00440406000D480D4C1F004C3C351380002D44050780001D441D4825900005A5047590000644447804245380002C1C3F004
+  - Name:            .debug_abbrev
+    Type:            SHT_PROGBITS
+    AddressAlign:    0x1
+    Content:         011101252513050325721710171B25111B120673170000022E01111B1206401803253A0B3B0B271949133F190000030500021803253A0B3B0B49130000042E00111B1206401803253A0B3B0B271949133F19000005240003253E0B0B0B000000
+  - Name:            .debug_info
+    Type:            SHT_PROGBITS
+    AddressAlign:    0x1
+    Content:         0000007F00050104000000000100001D01000000080000000002000000004E00000008020000000014015704000100000076030291020A000100000076030291000B0001000000760004010000000A01570500020000007A04020000000A01570700030000007E04030000002601570900040000007605030502050605040508040800
+  - Name:            .debug_str_offsets
+    Type:            SHT_PROGBITS
+    AddressAlign:    0x1
+    Content:         00000034000500000000002D00000096000000090000002400000012000000280000000400000000000000180000001F0000001000000016
+  - Name:            .comment
+    Type:            SHT_PROGBITS
+    Flags:           [ SHF_MERGE, SHF_STRINGS ]
+    AddressAlign:    0x1
+    EntSize:         0x1
+    Content:         00636C616E672076657273696F6E2032342E302E306769742028676974406769746875622E636F6D3A6A706C637A2F6D6572613430302D6C6C766D2E676974206535393961376330386335393339633234373634663939616665623032376133366630373936376429004C696E6B65723A204C4C442032342E302E302028676974406769746875622E636F6D3A6A706C637A2F6D6572613430302D6C6C766D2E67697420653539396137633038633539333963323437363466393961666562303237613336663037393637642900
+  - Name:            .debug_frame
+    Type:            SHT_PROGBITS
+    AddressAlign:    0x4
+    Content:         00000018FFFFFFFF04000400027E080C0700160804740031240000000000001400000000000000B400000014410E04480E0000000000000C00000000000000C80000000A0000000C00000000000000D20000000A0000002400000000000000DC00000026430E061608089C117E22940231244F0E0016080474003124
+  - Name:            .debug_line
+    Type:            SHT_PROGBITS
+    AddressAlign:    0x1
+    Content:         000000760005040000000037020101FB0E0D00010101010000000100000101011F010000000003011F020F051E010000000700F55589D7ABF85E8FB0A4F9F8D05224CC0400000502000000B40105200A4A0524062E05222005192E0513060A2105140A5905005905190A66052A064A05234A0512200204000101
+  - Name:            .debug_line_str
+    Type:            SHT_PROGBITS
+    Flags:           [ SHF_MERGE, SHF_STRINGS ]
+    AddressAlign:    0x1
+    EntSize:         0x1
+    Content:         2F746D702F7400662E6300
+Symbols:
+  - Name:            f.c
+    Type:            STT_FILE
+    Index:           SHN_ABS
+  - Name:            add
+    Type:            STT_FUNC
+    Section:         .text
+    Binding:         STB_GLOBAL
+    Value:           0xB4
+    Size:            0x14
+  - Name:            wide
+    Type:            STT_FUNC
+    Section:         .text
+    Binding:         STB_GLOBAL
+    Value:           0xC8
+    Size:            0xA
+  - Name:            dbl
+    Type:            STT_FUNC
+    Section:         .text
+    Binding:         STB_GLOBAL
+    Value:           0xD2
+    Size:            0xA
+  - Name:            main
+    Type:            STT_FUNC
+    Section:         .text
+    Binding:         STB_GLOBAL
+    Value:           0xDC
+    Size:            0x26
+DWARF:
+  debug_str:
+    - dbl
+    - long
+    - '/'
+    - a
+    - add
+    - b
+    - double
+    - main
+    - int
+    - wide
+    - 'clang version 24.0.0git (git@github.com:jplcz/mera400-llvm.git e599a7c08c5939c24764f99afeb027a36f07967d)'
+    - f.c
+  debug_addr:
+    - Length:          0x14
+      Version:         0x5
+      AddressSize:     0x4
+      Entries:
+        - Address:         0xB4
+        - Address:         0xC8
+        - Address:         0xD2
+        - Address:         0xDC
+...

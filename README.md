@@ -121,6 +121,37 @@ clang --target=mera400-unknown-crook --sysroot=/path/to/sysroot \
 clang --target=mera400-unknown-none -S -O2 foo.c -o -
 ```
 
+## Debugging with LLDB (work in progress)
+
+A debugger lets you inspect a program: see its source lines, variables and
+machine code. LLDB is LLVM's debugger. So far it works *statically*, on ELF
+files, and it can connect to a GDB-remote debug stub (`gdb-remote host:port`)
+that describes MERA-400 registers via `lldb/test/Shell/Process/Inputs/mera400-core.xml`.
+No machine or emulator provides such a stub yet; the test suite uses a small
+fake one (`mera400-stub.py`) to check register, memory and unwinding support.
+
+To build it, add `lldb` to the project list (the Python and terminal-editing
+options can be switched off to keep dependencies small):
+
+```sh
+cmake -G Ninja -S llvm -B build ... \
+  -DLLVM_ENABLE_PROJECTS="clang;lld;lldb" \
+  -DLLDB_ENABLE_PYTHON=OFF -DLLDB_ENABLE_LUA=OFF
+ninja -C build lldb
+```
+
+Compile with `-g` to get debug information. It lives only in the ELF file;
+the flat image deployed to the device does not contain it, so it costs no
+device memory.
+
+```sh
+build/bin/lldb hello.elf
+(lldb) disassemble -n main       # machine code of main
+(lldb) image lookup -a 0x100 -v  # source line and variables at an address
+```
+
+Addresses are byte addresses (twice the machine's word address).
+
 ## Upstream LLVM
 
 For general LLVM information (other targets, contributing, community) see the

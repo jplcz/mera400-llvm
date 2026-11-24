@@ -1,0 +1,21 @@
+# REQUIRES: mera400
+# The MERA-400 ABI plugin reads function results from R1..R3 (`finish`). The fake
+# stub stands in a process stopped at the last instruction of a function, with its return address in R4 (a word
+# address: 0xf0 / 2) and the stack pointer in R7.
+# RUN: yaml2obj %S/Inputs/mera400-return.yaml -o %t.elf
+
+# A 32-bit integer comes back in R1:R2, high word first.
+# RUN: %python %S/Inputs/mera400-stub.py --reg ic=d0 --reg r4=78 --reg r7=200 \
+# RUN:   --reg r1=1234 --reg r2=5678 --stop ic=f0 %S/Inputs/mera400-core.xml \
+# RUN:   %lldb -b %t.elf -o "gdb-remote 127.0.0.1:@PORT@" -o "finish" \
+# RUN:   -o "detach" 2>&1 | FileCheck --check-prefix=INT %s
+# INT: Return value: (long) $0 = 305419896
+
+# A floating point number is three words in the machine's own format
+# (a 40-bit mantissa and an 8-bit exponent); LLDB shows it as a double.
+# RUN: %python %S/Inputs/mera400-stub.py --reg ic=da --reg r4=78 --reg r7=200 \
+# RUN:   --reg r1=6000 --reg r2=0 --reg r3=1 --stop ic=f0 \
+# RUN:   %S/Inputs/mera400-core.xml \
+# RUN:   %lldb -b %t.elf -o "gdb-remote 127.0.0.1:@PORT@" -o "finish" \
+# RUN:   -o "detach" 2>&1 | FileCheck --check-prefix=FLOAT %s
+# FLOAT: Return value: ({{[a-z]+}}) $0 = 1.5

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- Register description a MERA-400 debug stub serves to LLDB (through the
+     qXfer:features:read packet) so that LLDB needs no built-in knowledge of
+     the register layout. Register order is the order of the 'g' packet.
+     r7 (stack pointer) and ic (instruction counter) are BYTE addresses, as in
+     ELF and DWARF; r4 holds the return address left by 'rj' as a WORD
+     address. -->
+<target version="1.0">
+  <architecture>mera400</architecture>
+  <feature name="org.llvm.mera400.core">
+    <reg name="r0" bitsize="16" type="int" regnum="0" dwarf_regnum="0"/>
+    <reg name="r1" bitsize="16" type="int" regnum="1" dwarf_regnum="1" generic="arg1"/>
+    <reg name="r2" bitsize="16" type="int" regnum="2" dwarf_regnum="2" generic="arg2"/>
+    <reg name="r3" bitsize="16" type="int" regnum="3" dwarf_regnum="3" generic="arg3"/>
+    <reg name="r4" bitsize="16" type="int" regnum="4" dwarf_regnum="4"/>
+    <reg name="r5" bitsize="16" type="int" regnum="5" dwarf_regnum="5"/>
+    <reg name="r6" bitsize="16" type="int" regnum="6" dwarf_regnum="6"/>
+    <reg name="r7" bitsize="16" type="data_ptr" regnum="7" dwarf_regnum="7" generic="sp"/>
+    <reg name="ic" bitsize="32" type="code_ptr" regnum="8" dwarf_regnum="8" generic="pc"/>
+    <reg name="sr" bitsize="16" type="int" regnum="9"/>
+  </feature>
+</target>

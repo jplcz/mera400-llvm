@@ -1,0 +1,5 @@
+# REQUIRES: mera400
+# The MERA-400 ABI plugin is built and registered. Its unwinding and
+# return-value logic is exercised by the debug-stub tests.
+# RUN: %lldb -b -o "plugin list abi" | FileCheck %s
+# CHECK: sysv-mera400 {{.*}}mera400
