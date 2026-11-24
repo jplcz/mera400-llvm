@@ -63,6 +63,16 @@ void Mera400ToolChain::AddClangSystemIncludeArgs(
   addSystemInclude(DriverArgs, CC1Args, Dir.str());
 }
 
+void Mera400ToolChain::AddClangCXXStdlibIncludeArgs(
+    const ArgList &DriverArgs, ArgStringList &CC1Args) const {
+  if (DriverArgs.hasArg(options::OPT_nostdinc, options::OPT_nostdlibinc,
+                        options::OPT_nostdincxx))
+    return;
+  SmallString<128> Dir(computeSysRoot());
+  llvm::sys::path::append(Dir, "include", "c++", "v1");
+  addSystemInclude(DriverArgs, CC1Args, Dir.str());
+}
+
 void Mera400ToolChain::addClangTargetOptions(const ArgList &DriverArgs,
                                              ArgStringList &CC1Args,
                                              BoundArch BA,
@@ -86,8 +96,8 @@ void Mera400ToolChain::addClangTargetOptions(const ArgList &DriverArgs,
       !DriverArgs.hasArg(options::OPT_funsigned_char,
                          options::OPT_fno_signed_char))
     CC1Args.push_back("-fno-signed-char");
-  // __cxa_atexit is part of the C++ runtime that is not provided; global
-  // destructors are run by crt0 instead.
+  // Global destructors are registered with atexit and run by exit (the
+  // library's __cxa_atexit is only a stub that runs nothing).
   CC1Args.push_back("-fno-use-cxa-atexit");
 
   // The large model needs both the ABI (it selects the data layout with 32-bit

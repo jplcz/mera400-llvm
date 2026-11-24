@@ -29,6 +29,14 @@ public:
   void
   AddClangSystemIncludeArgs(const llvm::opt::ArgList &DriverArgs,
                             llvm::opt::ArgStringList &CC1Args) const override;
+  /// Adds <sysroot>/include/c++/v1, where the header-only libc++ is installed
+  /// (see docs for the sysroot layout); libc++ is the only C++ library.
+  void AddClangCXXStdlibIncludeArgs(
+      const llvm::opt::ArgList &DriverArgs,
+      llvm::opt::ArgStringList &CC1Args) const override;
+  CXXStdlibType GetDefaultCXXStdlibType() const override {
+    return ToolChain::CST_Libcxx;
+  }
   void addClangTargetOptions(const llvm::opt::ArgList &DriverArgs,
                              llvm::opt::ArgStringList &CC1Args, BoundArch BA,
                              Action::OffloadKind) const override;
