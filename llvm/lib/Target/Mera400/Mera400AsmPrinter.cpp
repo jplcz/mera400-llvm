@@ -29,6 +29,7 @@
 #include "llvm/CodeGen/MachineInstr.h"
 #include "llvm/CodeGen/MachinePassManager.h"
 #include "llvm/IR/Constants.h"
+#include "llvm/IR/Module.h"
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/Operator.h"
 #include "llvm/MC/MCExpr.h"
