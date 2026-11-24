@@ -117,7 +117,7 @@ void collectAccesses(const DataLayout &DL, Value *Root,
             S->getValueOperand()->getType()->isSized())
           Out.push_back({S, Range(S->getValueOperand()->getType())});
       } else if (auto *GEP = dyn_cast<GEPOperator>(U)) {
-        APInt Constant(64, 0);
+        APInt Constant(DL.getIndexTypeSizeInBits(GEP->getType()), 0);
         int64_t Off = Everything;
         if (It.Off != Everything && GEP->accumulateConstantOffset(DL, Constant))
           Off = It.Off + Constant.getSExtValue();

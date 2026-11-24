@@ -64,6 +64,9 @@ def : Processor<"mx16", NoItineraries, [FeatureMX16]>;
 class MeraReg<bits<3> Encoding, string Name> : Register<Name> {
   let Namespace = "Mera400";
   let HWEncoding{2-0} = Encoding;
+  // DWARF numbers equal the hardware numbers, so debuggers and the stub that
+  // serves them agree on register numbering without a translation table.
+  let DwarfNumbers = [Encoding];
 }
 
 def R0 : MeraReg<0, "r0">;
@@ -74,6 +77,17 @@ def R4 : MeraReg<4, "r4">;
 def R5 : MeraReg<5, "r5">;
 def R6 : MeraReg<6, "r6">;
 def R7 : MeraReg<7, "r7">;
+
+// The instruction counter. No instruction names it and no register class
+// contains it, so code generation never allocates it; it exists as the DWARF
+// "return address" column (number 8). A caller's IC is derived from R4 by
+// the unwind rules emitted in the call frame information: R4 holds a *word*
+// address while debuggers work in byte addresses, so the rule multiplies by
+// two.
+def IC : Register<"ic"> {
+  let Namespace = "Mera400";
+  let DwarfNumbers = [8];
+}
 
 // Every register an instruction can name; this is what the assembler uses.
 def GR16 : RegisterClass<"Mera400", [i16], 16,

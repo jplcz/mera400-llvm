@@ -40,6 +40,9 @@ Mera400TargetMachine::Mera400TargetMachine(const Target &T, const Triple &TT,
                                getEffectiveCodeModel(CM, CodeModel::Small), OL),
       TLOF(std::make_unique<TargetLoweringObjectFileELF>()),
       Subtarget(TT, std::string(CPU), std::string(FS), *this) {
+  // Early returns restore R7, so blocks after them need the frame state of
+  // the function body re-established for the unwinder.
+  this->Options.EnableCFIFixup = true;
   initAsmInfo();
 }
 

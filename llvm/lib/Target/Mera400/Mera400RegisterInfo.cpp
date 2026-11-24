@@ -28,7 +28,7 @@ using namespace llvm;
 #include "Mera400GenRegisterInfo.inc"
 
 Mera400RegisterInfo::Mera400RegisterInfo()
-    : Mera400GenRegisterInfo(Mera400::R4) {}
+    : Mera400GenRegisterInfo(Mera400::IC) {}
 
 const MCPhysReg *
 Mera400RegisterInfo::getCalleeSavedRegs(const MachineFunction *) const {
@@ -46,6 +46,7 @@ BitVector Mera400RegisterInfo::getReservedRegs(const MachineFunction &) const {
   Reserved.set(Mera400::R0); // flags
   Reserved.set(Mera400::R4); // return address, saved in the frame by non-leaf functions
   Reserved.set(Mera400::R7); // stack pointer
+  Reserved.set(Mera400::IC); // only a DWARF column, never allocated
   return Reserved;
 }
 

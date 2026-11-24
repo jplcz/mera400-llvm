@@ -46,6 +46,8 @@ public:
 };
 
 void Mera400CodeGenPassBuilder::addPreISel(PassManagerWrapper &PMW) {
+  // Function passes queued before this point must run before a module pass.
+  flushFPMsToMPM(PMW);
   addModulePass(Mera400LowerGlobalSpacesPass(), PMW);
   addFunctionPass(Mera400LowerPointersPass(), PMW);
 }

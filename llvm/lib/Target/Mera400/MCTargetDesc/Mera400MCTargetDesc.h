@@ -16,6 +16,8 @@
 #define LLVM_LIB_TARGET_MERA400_MCTARGETDESC_MERA400MCTARGETDESC_H
 
 #include "llvm/MC/MCFixup.h"
+#include <cstdint>
+#include <string>
 
 namespace llvm {
 class Target;
@@ -36,7 +38,22 @@ enum Fixups {
   // 7-bit sign-magnitude word address of a symbol (short value operands).
   fixup_word7,
 };
-}
+
+// DWARF numbers of the registers debuggers see (they equal the hardware
+// numbers): R4 receives the return address and R7 is the stack pointer. IC,
+// the instruction counter, is the DWARF return address column.
+enum DwarfRegisters : unsigned { DwarfR4 = 4, DwarfR7 = 7, DwarfIC = 8 };
+
+// Raw DWARF call frame instructions (DW_CFA_val_expression) that compute the
+// caller's IC. R4 and return addresses saved in the frame are *word*
+// addresses, while debuggers use byte addresses, so both rules multiply by 2.
+//
+// A leaf function still holds its return address in R4.
+std::string getICFromR4Rule();
+// A function that makes calls saved R4 in the frame, CFAOffset bytes from the
+// CFA (a negative number).
+std::string getICFromSavedR4Rule(int64_t CFAOffset);
+} // namespace Mera400
 
 MCCodeEmitter *createMera400MCCodeEmitter(const MCInstrInfo &MCII,
                                           MCContext &Ctx);

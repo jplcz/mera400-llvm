@@ -16,7 +16,9 @@
 #include "Mera400InstPrinter.h"
 #include "Mera400TargetStreamer.h"
 #include "TargetInfo/Mera400TargetInfo.h"
+#include "llvm/BinaryFormat/Dwarf.h"
 #include "llvm/MC/MCAsmInfoELF.h"
+#include "llvm/MC/MCDwarf.h"
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCInstrAnalysis.h"
 #include "llvm/MC/MCInstrInfo.h"
@@ -26,6 +28,7 @@
 #include "llvm/MC/MCSubtargetInfo.h"
 #include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/Compiler.h"
+#include "llvm/Support/LEB128.h"
 
 using namespace llvm;
 
@@ -35,6 +38,39 @@ using namespace llvm;
 #include "Mera400GenRegisterInfo.inc"
 #define GET_SUBTARGETINFO_MC_DESC
 #include "Mera400GenSubtargetInfo.inc"
+
+std::string Mera400::getICFromR4Rule() {
+  // IC = R4 << 1
+  std::string Expr;
+  Expr += char(dwarf::DW_OP_breg0 + DwarfR4);
+  Expr += char(0);
+  Expr += char(dwarf::DW_OP_lit1);
+  Expr += char(dwarf::DW_OP_shl);
+  std::string Rule;
+  raw_string_ostream OS(Rule);
+  OS << char(dwarf::DW_CFA_val_expression);
+  encodeULEB128(DwarfIC, OS);
+  encodeULEB128(Expr.size(), OS);
+  OS << Expr;
+  return Rule;
+}
+
+std::string Mera400::getICFromSavedR4Rule(int64_t CFAOffset) {
+  // IC = (*(uint16_t *)(CFA + CFAOffset)) << 1
+  std::string Expr;
+  raw_string_ostream ExprOS(Expr);
+  ExprOS << char(dwarf::DW_OP_call_frame_cfa) << char(dwarf::DW_OP_consts);
+  encodeSLEB128(CFAOffset, ExprOS);
+  ExprOS << char(dwarf::DW_OP_plus) << char(dwarf::DW_OP_deref_size)
+         << char(2) << char(dwarf::DW_OP_lit1) << char(dwarf::DW_OP_shl);
+  std::string Rule;
+  raw_string_ostream OS(Rule);
+  OS << char(dwarf::DW_CFA_val_expression);
+  encodeULEB128(DwarfIC, OS);
+  encodeULEB128(Expr.size(), OS);
+  OS << Expr;
+  return Rule;
+}
 
 namespace {
 // Big-endian words, 2-byte instruction alignment, and ";" starts a comment.
@@ -48,6 +84,13 @@ public:
     // EMAS has no statement separator; the default ";" is the comment
     // character here, so a character that never appears in sources is used.
     SeparatorString = "{";
+    // Debug information is emitted only on request (-g). Offsets and
+    // addresses use 4-byte ELF fields in both memory models, so DWARF needs no
+    // 16-bit relocations. Stack slots are one word.
+    SupportsDebugInformation = true;
+    UsesCFIWithoutEH = true; // call frame information for -g without exceptions
+    CodePointerSize = 4;
+    CalleeSaveStackSlotSize = 2;
   }
 };
 
@@ -123,7 +166,14 @@ MCObjectFileInfo *createObjectFileInfo(MCContext &Ctx, bool PIC,
 
 MCAsmInfo *createAsmInfo(const MCRegisterInfo &, const Triple &,
                          const MCTargetOptions &Options) {
-  return new Mera400MCAsmInfo(Options);
+  auto *MAI = new Mera400MCAsmInfo(Options);
+  // At function entry the CFA (the stack pointer before the call) is R7, and
+  // the caller's IC is derived from R4. The stub reports R7 in bytes.
+  MAI->addInitialFrameState(MCCFIInstruction::cfiDefCfa(
+      nullptr, Mera400::DwarfR7, 0));
+  MAI->addInitialFrameState(
+      MCCFIInstruction::createEscape(nullptr, Mera400::getICFromR4Rule()));
+  return MAI;
 }
 
 MCInstrInfo *createInstrInfo() {
@@ -134,7 +184,7 @@ MCInstrInfo *createInstrInfo() {
 
 MCRegisterInfo *createRegisterInfo(const Triple &) {
   auto *Info = new MCRegisterInfo();
-  InitMera400MCRegisterInfo(Info, 0);
+  InitMera400MCRegisterInfo(Info, Mera400::IC);
   return Info;
 }
 
