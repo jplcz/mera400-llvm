@@ -9,6 +9,8 @@ assembler and link with LLD, instead of hand-writing assembly.
 Everything else in the tree is stock LLVM; the MERA-400 work is small and
 additive, so it can be rebased on upstream.
 
+[MERA-400 libc](https://github.com/jplcz/mera400-libc) project provides C/C++ runtimes.
+
 ## Why a fork
 
 The MERA-400 is unusual: memory is addressed in 16-bit *words* (not bytes),
@@ -22,7 +24,7 @@ Upstream LLVM has none of it, hence this fork.
 
 | Area | Location |
 | ---- | -------- |
-| Backend (instruction selection, ABI, frame lowering, AsmPrinter) | `llvm/lib/Target/Mera400/` |
+| Backend (instruction selection, [ABI](https://github.com/jplcz/mera400-libc/blob/master/docs/abi.md), frame lowering, AsmPrinter) | `llvm/lib/Target/Mera400/` |
 | Assembler parser, disassembler, MC layer (encoding, relocations, float format) | `llvm/lib/Target/Mera400/{AsmParser,Disassembler,MCTargetDesc}/` |
 | Target triple support (`mera400`, OS `none` and `crook`) | `llvm/include/llvm/TargetParser/Triple.h` |
 | ELF machine id (`EM_MERA400_EXPERIMENTAL`, 0x4d34) and relocations | `llvm/include/llvm/BinaryFormat/ELF*.{h,def}`, `ELFRelocs/Mera400.def` |
